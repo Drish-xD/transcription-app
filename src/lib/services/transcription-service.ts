@@ -82,7 +82,6 @@ export const transcriptionService = {
       }
 
       const audioBlob = await response.blob();
-
       // Convert Blob to File object for upload
       const mimeType = recording.metadata?.mimeType || "audio/mp3";
       const file = new File([audioBlob], recording.name, {
