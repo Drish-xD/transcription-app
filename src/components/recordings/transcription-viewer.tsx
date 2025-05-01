@@ -16,6 +16,8 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { updateTranscriptionContent } from "./actions";
+import { TranscriptionRequestButton } from "./transcription-request-button";
+
 interface TranscriptionViewerProps {
   transcription: InferSelectModel<typeof transcriptions>;
 }
@@ -92,6 +94,7 @@ export function TranscriptionViewer({
         <p className="text-sm text-muted-foreground">
           There was an error processing this transcription
         </p>
+        <TranscriptionRequestButton recordingId={transcription.recordingId} />
       </div>
     );
   }

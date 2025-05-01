@@ -45,9 +45,10 @@ export const recordingService = {
       throw new Error(`Failed to upload recording: ${fileError.message}`);
     }
 
-    const fileUrl = supabaseClient.storage
-      .from("recordings")
-      .getPublicUrl(fileName).data.publicUrl;
+    // Get the full URL with the correct path
+    const {
+      data: { publicUrl },
+    } = supabaseClient.storage.from("recordings").getPublicUrl(fileName);
 
     // Generate thumbnail for video recordings (if applicable)
     let thumbnailUrl: string | undefined;
@@ -69,7 +70,7 @@ export const recordingService = {
         userId: userId,
         folderId: folderId,
         type: type,
-        fileUrl,
+        fileUrl: publicUrl,
         thumbnailUrl,
         duration,
         metadata: metadata || null,
@@ -83,11 +84,10 @@ export const recordingService = {
    * Get recordings for a specific folder
    */
   async getFolderRecordings(folderId: string) {
-    return db
-      .select()
-      .from(recordings)
-      .where(eq(recordings.folderId, folderId))
-      .orderBy(desc(recordings.createdAt));
+    return db.query.recordings.findMany({
+      where: (recordings) => eq(recordings.folderId, folderId),
+      orderBy: ({ createdAt }, { asc }) => [asc(createdAt)],
+    });
   },
 
   /**

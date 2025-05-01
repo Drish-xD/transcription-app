@@ -70,7 +70,7 @@ export function RecordingForm({
       // Update duration every second
       intervalId = setInterval(() => {
         const elapsedSeconds = Math.floor(
-          (Date.now() - startTimeRef.current) / 1000
+          (Date.now() - startTimeRef.current) / 1000,
         );
         setDuration(elapsedSeconds);
       }, 1000);
@@ -180,7 +180,7 @@ export function RecordingForm({
         `${data.name}.${recordingType === "screen" ? "webm" : "webm"}`,
         {
           type: recordingType === "screen" ? "video/webm" : "audio/webm",
-        }
+        },
       );
 
       await saveRecording({

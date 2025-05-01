@@ -10,16 +10,18 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 interface FolderPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function FolderPage({ params }: FolderPageProps) {
+  const { id } = await params;
+
   const user = await getCurrentUser();
 
   // Get folder details
-  const folder = await folderService.getFolder(await params.id);
+  const folder = await folderService.getFolder(id);
 
   if (!folder || folder.userId !== user.id) {
     notFound();
@@ -99,7 +101,7 @@ export default async function FolderPage({ params }: FolderPageProps) {
           <CardTitle>Recordings</CardTitle>
         </CardHeader>
         <CardContent>
-          <RecentRecordings recordings={recordings} />
+          <RecentRecordings recordings={recordings} folderId={id} />
         </CardContent>
       </Card>
     </div>

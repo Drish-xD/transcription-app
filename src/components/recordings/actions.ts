@@ -1,8 +1,8 @@
-'use server';
+"use server";
 
 import { recordingService } from "@/lib/services/recording-service";
 import { transcriptionService } from "@/lib/services/transcription-service";
-// import { revalidatePath } from "next/cache";
+import { revalidatePath } from "next/cache";
 
 export interface SaveRecordingParams {
   userId: string;
@@ -46,7 +46,7 @@ export async function saveRecording({
       await transcriptionService.createTranscription(recording.id);
     }
 
-    // revalidatePath("/dashboard");
+    revalidatePath("/dashboard");
 
     return { success: true, recordingId: recording.id };
   } catch (error) {
@@ -62,11 +62,28 @@ export async function updateTranscriptionContent({
   try {
     await transcriptionService.updateTranscriptionContent(id, content);
 
-    // revalidatePath("/dashboard/recordings/[id]", "page");
+    revalidatePath("/dashboard/recordings/[id]", "page");
 
     return { success: true };
   } catch (error) {
     console.error("Error updating transcription:", error);
     throw new Error("Failed to update transcription");
+  }
+}
+
+/**
+ * Request transcription for an existing recording.
+ */
+export async function requestTranscription(recordingId: string) {
+  try {
+    const transcription =
+      await transcriptionService.createTranscription(recordingId);
+    return { success: true, transcriptionId: transcription.id };
+  } catch (error) {
+    console.error("Error requesting transcription:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }

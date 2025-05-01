@@ -12,20 +12,20 @@ import { folderService } from "@/lib/services/folder-service";
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
 
-export default async function NewRecordingPage() {
+export default async function NewRecordingPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ folderId: string }>;
+}) {
+  const { folderId: folderIdParam } = await searchParams;
   const user = await getCurrentUser();
 
-  // Get all folders for the user
-  const folders = await folderService.getRootFolders(user.id);
-
-  // If the user has no folders, create a default workspace
-  let defaultFolderId: string;
-
-  if (folders.length === 0) {
-    const defaultFolder = await folderService.createDefaultWorkspace(user.id);
-    defaultFolderId = defaultFolder.id;
+  let folderId: string;
+  if (folderIdParam) {
+    folderId = folderIdParam;
   } else {
-    defaultFolderId = folders[0].id;
+    const folders = await folderService.getRootFolders(user.id);
+    folderId = folders[0].id;
   }
 
   return (
@@ -51,7 +51,7 @@ export default async function NewRecordingPage() {
           <CardContent>
             <RecordingForm
               userId={user.id}
-              folderId={defaultFolderId}
+              folderId={folderId}
               recordingType="screen"
             />
           </CardContent>
@@ -67,7 +67,7 @@ export default async function NewRecordingPage() {
           <CardContent>
             <RecordingForm
               userId={user.id}
-              folderId={defaultFolderId}
+              folderId={folderId}
               recordingType="audio"
             />
           </CardContent>

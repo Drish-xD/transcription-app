@@ -14,16 +14,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 interface EditFolderPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function EditFolderPage({ params }: EditFolderPageProps) {
+  const { id } = await params;
   const user = await getCurrentUser();
 
   // Get folder details
-  const folder = await folderService.getFolder(params.id);
+  const folder = await folderService.getFolder(id);
 
   if (!folder || folder.userId !== user.id) {
     notFound();

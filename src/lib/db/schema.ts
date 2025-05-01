@@ -125,6 +125,7 @@ export const transcriptions = pgTable("transcriptions", {
     .default(sql`gen_random_uuid()`),
   recordingId: text()
     .notNull()
+    .unique()
     .references(() => recordings.id, { onDelete: "cascade" }),
   content: text(),
   status: transcriptionStatusEnum().notNull().default("pending"),

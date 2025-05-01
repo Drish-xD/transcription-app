@@ -7,9 +7,13 @@ import Link from "next/link";
 
 interface RecentRecordingsProps {
   recordings: InferSelectModel<typeof recordings>[];
+  folderId: string;
 }
 
-export function RecentRecordings({ recordings }: RecentRecordingsProps) {
+export function RecentRecordings({
+  recordings,
+  folderId,
+}: RecentRecordingsProps) {
   // Format duration from seconds to MM:SS
   const formatDuration = (seconds?: number) => {
     if (!seconds) return "00:00";
@@ -73,7 +77,12 @@ export function RecentRecordings({ recordings }: RecentRecordingsProps) {
           <p className="mt-1 text-sm text-muted-foreground">
             Create your first recording to get started
           </p>
-          <Link href="/dashboard/recordings/new">
+          <Link
+            href={{
+              pathname: "/dashboard/recordings/new",
+              query: { folderId },
+            }}
+          >
             <Button className="mt-4">Create Recording</Button>
           </Link>
         </div>

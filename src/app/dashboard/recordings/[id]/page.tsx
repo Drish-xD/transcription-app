@@ -1,3 +1,4 @@
+import { TranscriptionRequestButton } from "@/components/recordings/transcription-request-button";
 import { TranscriptionViewer } from "@/components/recordings/transcription-viewer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,16 +11,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 interface RecordingPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default async function RecordingPage({ params }: RecordingPageProps) {
+  const { id } = await params;
   const user = await getCurrentUser();
 
   // Get recording details
-  const recording = await recordingService.getRecording(params.id);
+  const recording = await recordingService.getRecording(id);
 
   if (!recording || recording.userId !== user.id) {
     notFound();
@@ -129,6 +131,7 @@ export default async function RecordingPage({ params }: RecordingPageProps) {
                   <p className="mt-1 text-sm text-muted-foreground">
                     Transcription is being processed and will be available soon
                   </p>
+                  <TranscriptionRequestButton recordingId={recording.id} />
                 </div>
               )}
             </CardContent>

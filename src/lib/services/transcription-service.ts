@@ -1,7 +1,8 @@
 import { createPartFromUri, createUserContent } from "@google/genai";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { ai } from "../ai";
-import { db, supabaseClient } from "../db";
+import { db } from "../db";
 import { recordings, transcriptions } from "../db/schema";
 
 export const transcriptionService = {
@@ -16,7 +17,12 @@ export const transcriptionService = {
       .where(eq(transcriptions.recordingId, recordingId));
 
     if (existing.length > 0) {
-      return existing[0];
+      const status = existing[0].status;
+      if (status === "completed") {
+        return existing[0];
+      } else if (status !== "failed") {
+        return existing[0];
+      }
     }
 
     // Create a new transcription
@@ -25,6 +31,14 @@ export const transcriptionService = {
       .values({
         recordingId,
         status: "pending",
+      })
+      .onConflictDoUpdate({
+        target: transcriptions.recordingId,
+        set: {
+          status: "pending",
+          content: null,
+          updatedAt: new Date(),
+        },
       })
       .returning();
 
@@ -61,18 +75,17 @@ export const transcriptionService = {
 
       const { recording } = transcriptionWithRecording;
 
-      // Fetch the audio file from storage
-      const audioFile = await supabaseClient.storage
-        .from("recordings")
-        .download(recording.fileUrl);
-
-      if (!audioFile.data) {
-        throw new Error("Failed to fetch audio file from storage");
+      // Fetch the audio file using fileUrl
+      const response = await fetch(recording.fileUrl);
+      if (!response.ok) {
+        throw new Error("Failed to fetch audio file from fileUrl");
       }
 
-      // Convert Blob/ArrayBuffer to File object for upload
+      const audioBlob = await response.blob();
+
+      // Convert Blob to File object for upload
       const mimeType = recording.metadata?.mimeType || "audio/mp3";
-      const file = new File([audioFile.data], recording.name, {
+      const file = new File([audioBlob], recording.name, {
         type: mimeType,
       });
 
@@ -87,7 +100,7 @@ export const transcriptionService = {
       }
 
       // Generate transcription using Gemini
-      const response = await ai.models.generateContent({
+      const transcriptionResponse = await ai.models.generateContent({
         model: "gemini-2.0-flash",
         contents: createUserContent([
           createPartFromUri(uploadedFile.uri, mimeType),
@@ -95,11 +108,11 @@ export const transcriptionService = {
         ]),
       });
 
-      if (!response.text) {
+      if (!transcriptionResponse.text) {
         throw new Error("Failed to generate transcription");
       }
 
-      const transcribedText = response.text;
+      const transcribedText = transcriptionResponse.text;
 
       // Update transcription status and content in database
       await db
@@ -166,6 +179,8 @@ export const transcriptionService = {
       .update(transcriptions)
       .set({ content, updatedAt: new Date() })
       .where(eq(transcriptions.id, id));
+
+    revalidatePath(`/dashboard/recordings/${id}`);
   },
 
   /**
@@ -173,5 +188,7 @@ export const transcriptionService = {
    */
   async deleteTranscription(id: string) {
     await db.delete(transcriptions).where(eq(transcriptions.id, id));
+
+    revalidatePath(`/dashboard/recordings/${id}`);
   },
 };
