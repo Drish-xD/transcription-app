@@ -9,13 +9,13 @@ import Link from "next/link";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
-  
+
   // Get recent recordings
   const recentRecordings = await recordingService.getRecentRecordings(user.id);
-  
+
   // Get root folders
   const rootFolders = await folderService.getRootFolders(user.id);
-  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -32,7 +32,9 @@ export default async function DashboardPage() {
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Recordings</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Recordings
+            </CardTitle>
             <MicIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -49,7 +51,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-      
+
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
         <Card className="col-span-4">
           <CardHeader>
@@ -73,8 +75,8 @@ export default async function DashboardPage() {
             {rootFolders.length > 0 ? (
               <div className="space-y-2">
                 {rootFolders.map((folder) => (
-                  <Link 
-                    key={folder.id} 
+                  <Link
+                    key={folder.id}
                     href={`/dashboard/folders/${folder.id}`}
                     className="flex items-center gap-2 rounded-md p-2 hover:bg-accent"
                   >
@@ -98,4 +100,4 @@ export default async function DashboardPage() {
       </div>
     </div>
   );
-} 
+}

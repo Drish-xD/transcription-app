@@ -1,7 +1,9 @@
-import { eq } from 'drizzle-orm';
-import { db } from '../db';
-import { transcriptions } from '../db/schema';
-import { userService } from './user-service';
+import { createPartFromUri, createUserContent } from "@google/genai";
+import { eq } from "drizzle-orm";
+import { ai } from "../ai";
+import { db, supabaseClient } from "../db";
+import { recordings, transcriptions } from "../db/schema";
+import { userService } from "./user-service";
 
 export interface CreateTranscriptionParams {
   recordingId: string;
@@ -12,7 +14,10 @@ export const transcriptionService = {
   /**
    * Create a new transcription job
    */
-  async createTranscription({ recordingId, userId }: CreateTranscriptionParams) {
+  async createTranscription({
+    recordingId,
+    userId,
+  }: CreateTranscriptionParams) {
     // Check if a transcription already exists for this recording
     const existing = await db
       .select()
@@ -28,7 +33,7 @@ export const transcriptionService = {
       .insert(transcriptions)
       .values({
         recordingId,
-        status: 'pending',
+        status: "pending",
       })
       .returning();
 
@@ -46,61 +51,101 @@ export const transcriptionService = {
       // Update status to processing
       await db
         .update(transcriptions)
-        .set({ status: 'processing' })
+        .set({ status: "processing" })
         .where(eq(transcriptions.id, transcriptionId));
 
       // Get the recording information
-      const [transcription] = await db
+      const [transcriptionWithRecording] = await db
         .select({
-          id: transcriptions.id,
-          recordingId: transcriptions.recordingId,
+          transcription: transcriptions,
+          recording: recordings,
         })
         .from(transcriptions)
+        .innerJoin(recordings, eq(transcriptions.recordingId, recordings.id))
         .where(eq(transcriptions.id, transcriptionId));
 
-      if (!transcription) {
-        throw new Error('Transcription not found');
+      if (!transcriptionWithRecording) {
+        throw new Error("Transcription or recording not found");
       }
+
+      const { recording } = transcriptionWithRecording;
 
       // Get the user's Gemini API key
       const apiKey = await userService.getApiKey(userId);
-      
       if (!apiKey) {
-        throw new Error('No API key found for user');
+        throw new Error("No API key found for user");
       }
 
-      // In a real implementation, this would:
-      // 1. Fetch the audio file from storage
-      // 2. Convert it to a suitable format if needed
-      // 3. Call the Gemini API with the audio
-      // 4. Process the response
-      
-      // Simulating a successful transcription for now
-      // In production, call the Gemini API here
-      const transcribedText = "This is a simulated transcription. In production, this would be the actual transcribed text from Gemini AI.";
-      
-      // Update the transcription with the results
+      // Fetch the audio file from storage
+      const audioFile = await supabaseClient.storage
+        .from("recordings")
+        .download(recording.fileUrl);
+
+      if (!audioFile.data) {
+        throw new Error("Failed to fetch audio file from storage");
+      }
+
+      // Convert Blob/ArrayBuffer to File object for upload
+      const mimeType = recording.metadata?.mimeType || "audio/mp3";
+      const file = new File([audioFile.data], recording.name, {
+        type: mimeType,
+      });
+
+      // Upload the audio file to Gemini
+      const uploadedFile = await ai.files.upload({
+        file,
+        config: { mimeType },
+      });
+
+      if (!uploadedFile?.uri) {
+        throw new Error("Failed to upload file to Gemini");
+      }
+
+      // Generate transcription using Gemini
+      const response = await ai.models.generateContent({
+        model: "gemini-2.0-flash",
+        contents: createUserContent([
+          createPartFromUri(uploadedFile.uri, mimeType),
+          "Generate a detailed transcript of this audio, preserving all spoken content accurately.",
+        ]),
+      });
+
+      if (!response.text) {
+        throw new Error("Failed to generate transcription");
+      }
+
+      const transcribedText = response.text;
+
+      // Update transcription status and content in database
       await db
         .update(transcriptions)
         .set({
           content: transcribedText,
-          status: 'completed',
-          language: 'en', // In production, detect language from the response
+          status: "completed",
           updatedAt: new Date(),
         })
         .where(eq(transcriptions.id, transcriptionId));
+
+      return { success: true, transcription: transcribedText };
     } catch (error) {
-      console.error('Transcription error:', error);
-      
+      console.error("Transcription error:", error);
+
       // Update the transcription with error status
       await db
         .update(transcriptions)
         .set({
-          status: 'failed',
-          metadata: { error: error instanceof Error ? error.message : 'Unknown error' },
+          status: "failed",
+          metadata: {
+            error: error instanceof Error ? error.message : "Unknown error",
+          },
           updatedAt: new Date(),
         })
         .where(eq(transcriptions.id, transcriptionId));
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   },
 
@@ -112,7 +157,7 @@ export const transcriptionService = {
       .select()
       .from(transcriptions)
       .where(eq(transcriptions.id, id));
-    
+
     return transcription;
   },
 
@@ -124,7 +169,7 @@ export const transcriptionService = {
       .select()
       .from(transcriptions)
       .where(eq(transcriptions.recordingId, recordingId));
-    
+
     return transcription;
   },
 
@@ -144,4 +189,4 @@ export const transcriptionService = {
   async deleteTranscription(id: string) {
     await db.delete(transcriptions).where(eq(transcriptions.id, id));
   },
-}; 
+};

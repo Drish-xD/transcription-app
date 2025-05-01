@@ -1,9 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -23,7 +37,7 @@ type FolderFormValues = z.infer<typeof folderFormSchema>;
 interface Folder {
   id: string;
   name: string;
-  type: 'folder' | 'workspace';
+  type: "folder" | "workspace";
   createdAt: Date;
 }
 
@@ -46,7 +60,7 @@ export function FolderForm({ userId, folders }: FolderFormProps) {
 
   async function onSubmit(data: FolderFormValues) {
     setIsLoading(true);
-    
+
     try {
       const folder = await createFolder({
         userId,
@@ -54,7 +68,7 @@ export function FolderForm({ userId, folders }: FolderFormProps) {
         parentId: data.parentId || undefined,
         type: data.type,
       });
-      
+
       toast.success("Folder created successfully");
       router.push(`/dashboard/folders/${folder.id}`);
       router.refresh();
@@ -82,17 +96,14 @@ export function FolderForm({ userId, folders }: FolderFormProps) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="type"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Type</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
+              <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a type" />
@@ -104,13 +115,14 @@ export function FolderForm({ userId, folders }: FolderFormProps) {
                 </SelectContent>
               </Select>
               <FormDescription>
-                Workspaces are top-level containers, while folders can be nested inside workspaces or other folders.
+                Workspaces are top-level containers, while folders can be nested
+                inside workspaces or other folders.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
-        
+
         {folders.length > 0 && (
           <FormField
             control={form.control}
@@ -143,11 +155,11 @@ export function FolderForm({ userId, folders }: FolderFormProps) {
             )}
           />
         )}
-        
+
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? "Creating..." : "Create Folder"}
         </Button>
       </form>
     </Form>
   );
-} 
+}

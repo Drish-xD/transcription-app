@@ -1,18 +1,12 @@
-import * as dotenv from 'dotenv';
-import type { Config } from 'drizzle-kit';
-dotenv.config({ path: '.env.local' });
+import "dotenv/config";
+import { defineConfig } from "drizzle-kit";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL environment variable is required');
-}
-
-export default {
-  schema: './src/lib/db/schema.ts',
-  out: './drizzle',
-  driver: 'pg',
+export default defineConfig({
+  out: "./drizzle",
+  schema: "./src/lib/db/schema.ts",
+  dialect: "postgresql",
+  casing: "snake_case",
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL,
+    url: process.env.DATABASE_URL!,
   },
-  verbose: true,
-  strict: true,
-} satisfies Config; 
+});

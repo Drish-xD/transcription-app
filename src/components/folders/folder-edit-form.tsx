@@ -1,7 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -36,10 +43,10 @@ export function FolderEditForm({ folderId, initialName }: FolderEditFormProps) {
 
   async function onSubmit(data: FolderEditFormValues) {
     setIsLoading(true);
-    
+
     try {
       await renameFolder(folderId, data.name);
-      
+
       toast.success("Folder updated successfully");
       router.push(`/dashboard/folders/${folderId}`);
       router.refresh();
@@ -52,15 +59,19 @@ export function FolderEditForm({ folderId, initialName }: FolderEditFormProps) {
   }
 
   async function handleDelete() {
-    if (!window.confirm("Are you sure you want to delete this folder? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this folder? This action cannot be undone.",
+      )
+    ) {
       return;
     }
 
     setIsDeleting(true);
-    
+
     try {
       await deleteFolder(folderId);
-      
+
       toast.success("Folder deleted successfully");
       router.push("/dashboard/folders");
       router.refresh();
@@ -89,7 +100,7 @@ export function FolderEditForm({ folderId, initialName }: FolderEditFormProps) {
               </FormItem>
             )}
           />
-          
+
           <div className="flex gap-2">
             <Button type="submit" className="flex-1" disabled={isLoading}>
               {isLoading ? "Saving..." : "Save Changes"}
@@ -104,14 +115,15 @@ export function FolderEditForm({ folderId, initialName }: FolderEditFormProps) {
           </div>
         </form>
       </Form>
-      
+
       <div className="border-t pt-6">
         <h3 className="mb-4 text-lg font-medium">Danger Zone</h3>
         <p className="mb-4 text-sm text-muted-foreground">
-          Deleting a folder will permanently remove it and all its contents. This action cannot be undone.
+          Deleting a folder will permanently remove it and all its contents.
+          This action cannot be undone.
         </p>
-        <Button 
-          variant="destructive" 
+        <Button
+          variant="destructive"
           onClick={handleDelete}
           disabled={isDeleting}
         >
@@ -120,4 +132,4 @@ export function FolderEditForm({ folderId, initialName }: FolderEditFormProps) {
       </div>
     </div>
   );
-} 
+}

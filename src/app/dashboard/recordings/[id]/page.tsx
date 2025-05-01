@@ -17,17 +17,19 @@ interface RecordingPageProps {
 
 export default async function RecordingPage({ params }: RecordingPageProps) {
   const user = await getCurrentUser();
-  
+
   // Get recording details
   const recording = await recordingService.getRecording(params.id);
-  
+
   if (!recording || recording.userId !== user.id) {
     notFound();
   }
-  
+
   // Get transcription if it exists
-  const transcription = await transcriptionService.getTranscriptionByRecording(recording.id);
-  
+  const transcription = await transcriptionService.getTranscriptionByRecording(
+    recording.id,
+  );
+
   // Format duration from seconds to MM:SS
   const formatDuration = (seconds?: number) => {
     if (!seconds) return "00:00";
@@ -35,7 +37,7 @@ export default async function RecordingPage({ params }: RecordingPageProps) {
     const remainingSeconds = seconds % 60;
     return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
   };
-  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center">
@@ -47,7 +49,7 @@ export default async function RecordingPage({ params }: RecordingPageProps) {
         </Button>
         <h1 className="text-xl font-bold md:text-2xl">{recording.name}</h1>
       </div>
-      
+
       <div className="grid gap-6 md:grid-cols-3">
         <div className="md:col-span-2">
           <Card>
@@ -55,36 +57,38 @@ export default async function RecordingPage({ params }: RecordingPageProps) {
               <CardTitle>Recording</CardTitle>
             </CardHeader>
             <CardContent>
-              {recording.type === 'screen' ? (
-                <video 
-                  src={recording.fileUrl} 
-                  controls 
+              {recording.type === "screen" ? (
+                <video
+                  src={recording.fileUrl}
+                  controls
                   className="aspect-video w-full rounded-md"
                   poster={recording.thumbnailUrl || undefined}
                 />
               ) : (
-                <audio 
-                  src={recording.fileUrl} 
-                  controls 
-                  className="w-full"
-                />
+                <audio src={recording.fileUrl} controls className="w-full" />
               )}
-              
+
               <div className="mt-4 grid gap-2 text-sm md:grid-cols-2">
                 <div>
                   <p className="font-medium">Type</p>
                   <p className="text-muted-foreground">
-                    {recording.type.charAt(0).toUpperCase() + recording.type.slice(1)} Recording
+                    {recording.type.charAt(0).toUpperCase() +
+                      recording.type.slice(1)}{" "}
+                    Recording
                   </p>
                 </div>
                 <div>
                   <p className="font-medium">Duration</p>
-                  <p className="text-muted-foreground">{formatDuration(recording.duration)}</p>
+                  <p className="text-muted-foreground">
+                    {formatDuration(recording.duration)}
+                  </p>
                 </div>
                 <div>
                   <p className="font-medium">Created</p>
                   <p className="text-muted-foreground">
-                    {formatDistanceToNow(new Date(recording.createdAt), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(recording.createdAt), {
+                      addSuffix: true,
+                    })}
                   </p>
                 </div>
                 <div>
@@ -107,7 +111,7 @@ export default async function RecordingPage({ params }: RecordingPageProps) {
             </CardContent>
           </Card>
         </div>
-        
+
         <div>
           <Card className="h-full">
             <CardHeader>
@@ -133,4 +137,4 @@ export default async function RecordingPage({ params }: RecordingPageProps) {
       </div>
     </div>
   );
-} 
+}

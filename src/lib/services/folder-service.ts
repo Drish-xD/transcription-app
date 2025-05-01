@@ -1,6 +1,6 @@
-import { and, eq, isNull } from 'drizzle-orm';
-import { db } from '../db';
-import { folders, folderTypeEnum } from '../db/schema';
+import { db } from "@/lib/db";
+import { folders, folderTypeEnum } from "@/lib/db/schema";
+import { and, eq, isNull } from "drizzle-orm";
 
 export interface CreateFolderParams {
   name: string;
@@ -13,7 +13,12 @@ export const folderService = {
   /**
    * Create a new folder or workspace
    */
-  async createFolder({ name, userId, parentId, type = 'folder' }: CreateFolderParams) {
+  async createFolder({
+    name,
+    userId,
+    parentId,
+    type = "folder",
+  }: CreateFolderParams) {
     const [folder] = await db
       .insert(folders)
       .values({
@@ -83,9 +88,9 @@ export const folderService = {
    */
   async createDefaultWorkspace(userId: string) {
     return this.createFolder({
-      name: 'My Workspace',
+      name: "My Workspace",
       userId,
-      type: 'workspace',
+      type: "workspace",
     });
   },
-}; 
+};

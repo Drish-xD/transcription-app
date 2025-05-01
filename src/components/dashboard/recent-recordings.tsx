@@ -6,7 +6,7 @@ import Link from "next/link";
 interface Recording {
   id: string;
   name: string;
-  type: 'audio' | 'screen';
+  type: "audio" | "screen";
   duration?: number;
   createdAt: Date;
   fileUrl: string;
@@ -45,7 +45,8 @@ export function RecentRecordings({ recordings }: RecentRecordingsProps) {
                     </Link>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <span>
-                        {recording.type.charAt(0).toUpperCase() + recording.type.slice(1)}
+                        {recording.type.charAt(0).toUpperCase() +
+                          recording.type.slice(1)}
                       </span>
                       <span>•</span>
                       <span className="flex items-center gap-1">
@@ -53,16 +54,16 @@ export function RecentRecordings({ recordings }: RecentRecordingsProps) {
                         {formatDuration(recording.duration)}
                       </span>
                       <span>•</span>
-                      <span>{formatDistanceToNow(new Date(recording.createdAt), { addSuffix: true })}</span>
+                      <span>
+                        {formatDistanceToNow(new Date(recording.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
                     </div>
                   </div>
                 </div>
                 <div className="ml-4 flex gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    asChild
-                  >
+                  <Button variant="ghost" size="icon" asChild>
                     <Link href={recording.fileUrl} target="_blank" download>
                       <DownloadIcon className="h-4 w-4" />
                       <span className="sr-only">Download</span>
@@ -86,4 +87,4 @@ export function RecentRecordings({ recordings }: RecentRecordingsProps) {
       )}
     </div>
   );
-} 
+}

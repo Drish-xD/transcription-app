@@ -1,6 +1,12 @@
 import { FolderList } from "@/components/folders/folder-list";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/auth";
 import { folderService } from "@/lib/services/folder-service";
 import { FolderIcon, PlusIcon } from "lucide-react";
@@ -8,10 +14,10 @@ import Link from "next/link";
 
 export default async function FoldersPage() {
   const user = await getCurrentUser();
-  
+
   // Get root folders
   const rootFolders = await folderService.getRootFolders(user.id);
-  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -23,7 +29,7 @@ export default async function FoldersPage() {
           </Button>
         </Link>
       </div>
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Your Folders</CardTitle>
@@ -50,4 +56,4 @@ export default async function FoldersPage() {
       </Card>
     </div>
   );
-} 
+}

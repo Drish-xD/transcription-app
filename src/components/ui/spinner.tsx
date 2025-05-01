@@ -4,10 +4,7 @@ interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function Spinner({ className, ...props }: SpinnerProps) {
   return (
-    <div
-      className={cn("animate-spin", className)}
-      {...props}
-    >
+    <div className={cn("animate-spin", className)} {...props}>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="24"
@@ -24,4 +21,4 @@ export function Spinner({ className, ...props }: SpinnerProps) {
       <span className="sr-only">Loading</span>
     </div>
   );
-} 
+}

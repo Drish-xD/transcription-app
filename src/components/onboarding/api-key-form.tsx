@@ -1,7 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -37,13 +45,13 @@ export function ApiKeyForm({ userId }: ApiKeyFormProps) {
 
   async function onSubmit(data: ApiKeyFormValues) {
     setIsLoading(true);
-    
+
     try {
       await saveApiKey({
         userId,
         apiKey: data.apiKey,
       });
-      
+
       toast.success("API key saved successfully");
       router.push("/dashboard");
       router.refresh();
@@ -65,9 +73,9 @@ export function ApiKeyForm({ userId }: ApiKeyFormProps) {
             <FormItem>
               <FormLabel>Gemini API Key</FormLabel>
               <FormControl>
-                <Input 
-                  placeholder="Enter your Gemini API key" 
-                  {...field} 
+                <Input
+                  placeholder="Enter your Gemini API key"
+                  {...field}
                   type="password"
                 />
               </FormControl>
@@ -94,4 +102,4 @@ export function ApiKeyForm({ userId }: ApiKeyFormProps) {
       </form>
     </Form>
   );
-} 
+}

@@ -1,6 +1,6 @@
-import { eq } from 'drizzle-orm';
-import { db } from '../db';
-import { userApiKeys, users } from '../db/schema';
+import { eq } from "drizzle-orm";
+import { db } from "../db";
+import { userApiKeys, users } from "../db/schema";
 
 export interface SaveApiKeyParams {
   userId: string;
@@ -22,7 +22,7 @@ export const userService = {
   /**
    * Save the user's API key
    */
-  async saveApiKey({ userId, apiKey, provider = 'gemini' }: SaveApiKeyParams) {
+  async saveApiKey({ userId, apiKey, provider = "gemini" }: SaveApiKeyParams) {
     // Check if user already has an API key for this provider
     const existingKey = await db
       .select()
@@ -46,16 +46,13 @@ export const userService = {
     }
 
     // Update user hasApiKey flag
-    await db
-      .update(users)
-      .set({ hasApiKey: true })
-      .where(eq(users.id, userId));
+    await db.update(users).set({ hasApiKey: true }).where(eq(users.id, userId));
   },
 
   /**
    * Get the user's API key for a specific provider
    */
-  async getApiKey(userId: string, provider = 'gemini') {
+  async getApiKey(userId: string, provider = "gemini") {
     const result = await db
       .select({ apiKey: userApiKeys.apiKey })
       .from(userApiKeys)
@@ -68,7 +65,7 @@ export const userService = {
   /**
    * Remove the user's API key
    */
-  async removeApiKey(userId: string, provider = 'gemini') {
+  async removeApiKey(userId: string, provider = "gemini") {
     await db
       .delete(userApiKeys)
       .where(eq(userApiKeys.userId, userId))
@@ -87,4 +84,4 @@ export const userService = {
         .where(eq(users.id, userId));
     }
   },
-}; 
+};

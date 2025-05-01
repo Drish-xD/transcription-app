@@ -3,11 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
-    FolderIcon,
-    HomeIcon,
-    LogOutIcon,
-    MicIcon,
-    SettingsIcon,
+  FolderIcon,
+  HomeIcon,
+  LogOutIcon,
+  MicIcon,
+  SettingsIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,7 +28,9 @@ export function Sidebar() {
         href={href}
         className={cn(
           "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all hover:bg-accent",
-          pathname === href ? "bg-accent text-accent-foreground" : "text-muted-foreground"
+          pathname === href
+            ? "bg-accent text-accent-foreground"
+            : "text-muted-foreground",
         )}
       >
         {icon}
@@ -44,7 +46,11 @@ export function Sidebar() {
           <h2 className="text-lg font-semibold">Transcription App</h2>
         </div>
         <nav className="space-y-1">
-          <SidebarItem href="/dashboard" icon={<HomeIcon className="h-4 w-4" />} title="Dashboard" />
+          <SidebarItem
+            href="/dashboard"
+            icon={<HomeIcon className="h-4 w-4" />}
+            title="Dashboard"
+          />
           <SidebarItem
             href="/dashboard/recordings"
             icon={<MicIcon className="h-4 w-4" />}
@@ -82,4 +88,4 @@ export function Sidebar() {
       </div>
     </aside>
   );
-} 
+}

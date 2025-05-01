@@ -4,7 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
-import { CopyIcon, DownloadIcon, PencilIcon, SaveIcon, XIcon } from "lucide-react";
+import {
+  CopyIcon,
+  DownloadIcon,
+  PencilIcon,
+  SaveIcon,
+  XIcon,
+} from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { updateTranscriptionContent } from "./actions";
@@ -13,7 +19,7 @@ interface Transcription {
   id: string;
   recordingId: string;
   content: string | null;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: "pending" | "processing" | "completed" | "failed";
   language?: string;
   createdAt: Date;
 }
@@ -22,21 +28,23 @@ interface TranscriptionViewerProps {
   transcription: Transcription;
 }
 
-export function TranscriptionViewer({ transcription }: TranscriptionViewerProps) {
+export function TranscriptionViewer({
+  transcription,
+}: TranscriptionViewerProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [content, setContent] = useState(transcription.content || "");
   const [isSaving, setIsSaving] = useState(false);
-  
+
   const handleCopy = () => {
     if (!transcription.content) return;
-    
+
     navigator.clipboard.writeText(transcription.content);
     toast.success("Transcription copied to clipboard");
   };
-  
+
   const handleDownload = () => {
     if (!transcription.content) return;
-    
+
     const blob = new Blob([transcription.content], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -47,16 +55,16 @@ export function TranscriptionViewer({ transcription }: TranscriptionViewerProps)
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-  
+
   const handleSave = async () => {
     setIsSaving(true);
-    
+
     try {
       await updateTranscriptionContent({
         id: transcription.id,
         content,
       });
-      
+
       toast.success("Transcription updated successfully");
       setIsEditing(false);
     } catch (error) {
@@ -66,18 +74,23 @@ export function TranscriptionViewer({ transcription }: TranscriptionViewerProps)
       setIsSaving(false);
     }
   };
-  
-  if (transcription.status === 'pending' || transcription.status === 'processing') {
+
+  if (
+    transcription.status === "pending" ||
+    transcription.status === "processing"
+  ) {
     return (
       <div className="flex h-[300px] flex-col items-center justify-center">
         <Spinner className="mb-4 h-8 w-8" />
         <h3 className="font-medium">Processing transcription</h3>
-        <p className="text-sm text-muted-foreground">This may take a few minutes</p>
+        <p className="text-sm text-muted-foreground">
+          This may take a few minutes
+        </p>
       </div>
     );
   }
-  
-  if (transcription.status === 'failed') {
+
+  if (transcription.status === "failed") {
     return (
       <div className="flex h-[300px] flex-col items-center justify-center">
         <div className="mb-4 rounded-full bg-destructive/10 p-3 text-destructive">
@@ -90,7 +103,7 @@ export function TranscriptionViewer({ transcription }: TranscriptionViewerProps)
       </div>
     );
   }
-  
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -162,7 +175,7 @@ export function TranscriptionViewer({ transcription }: TranscriptionViewerProps)
           )}
         </div>
       </div>
-      
+
       {isEditing ? (
         <Textarea
           value={content}
@@ -172,9 +185,11 @@ export function TranscriptionViewer({ transcription }: TranscriptionViewerProps)
         />
       ) : (
         <div className="rounded-md border p-4">
-          <p className="whitespace-pre-wrap">{transcription.content || "No content available"}</p>
+          <p className="whitespace-pre-wrap">
+            {transcription.content || "No content available"}
+          </p>
         </div>
       )}
     </div>
   );
-} 
+}

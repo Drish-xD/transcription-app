@@ -5,11 +5,11 @@ import { redirect } from "next/navigation";
 
 export default async function LoginPage() {
   const session = await betterAuth.getSession();
-  
+
   if (session?.user) {
     redirect("/dashboard");
   }
-  
+
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
       <div className="w-full max-w-md space-y-8">
@@ -38,4 +38,4 @@ export default async function LoginPage() {
       </div>
     </div>
   );
-} 
+}

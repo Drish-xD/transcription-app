@@ -9,7 +9,7 @@ export default async function DashboardLayout({
 }>) {
   // Make sure the user has an API key set up
   const user = await requireApiKey();
-  
+
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
@@ -19,4 +19,4 @@ export default async function DashboardLayout({
       </div>
     </div>
   );
-} 
+}

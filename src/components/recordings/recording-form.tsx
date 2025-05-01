@@ -1,7 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { MicIcon, MonitorIcon, StopCircleIcon, TimerIcon } from "lucide-react";
@@ -21,10 +28,14 @@ type RecordingFormValues = z.infer<typeof recordingFormSchema>;
 interface RecordingFormProps {
   userId: string;
   folderId: string;
-  recordingType: 'screen' | 'audio';
+  recordingType: "screen" | "audio";
 }
 
-export function RecordingForm({ userId, folderId, recordingType }: RecordingFormProps) {
+export function RecordingForm({
+  userId,
+  folderId,
+  recordingType,
+}: RecordingFormProps) {
   const router = useRouter();
   const [isRecording, setIsRecording] = useState(false);
   const [duration, setDuration] = useState(0);
@@ -36,7 +47,7 @@ export function RecordingForm({ userId, folderId, recordingType }: RecordingForm
   const form = useForm<RecordingFormValues>({
     resolver: zodResolver(recordingFormSchema),
     defaultValues: {
-      name: `New ${recordingType === 'screen' ? 'Screen' : 'Audio'} Recording`,
+      name: `New ${recordingType === "screen" ? "Screen" : "Audio"} Recording`,
     },
   });
 
@@ -64,18 +75,21 @@ export function RecordingForm({ userId, folderId, recordingType }: RecordingForm
       mediaChunksRef.current = [];
       let stream: MediaStream;
 
-      if (recordingType === 'screen') {
+      if (recordingType === "screen") {
         // Start screen recording with audio
         const screenStream = await navigator.mediaDevices.getDisplayMedia({
           video: true,
         });
-        
+
         const audioStream = await navigator.mediaDevices.getUserMedia({
           audio: true,
         });
-        
+
         // Combine the streams
-        const tracks = [...screenStream.getTracks(), ...audioStream.getTracks()];
+        const tracks = [
+          ...screenStream.getTracks(),
+          ...audioStream.getTracks(),
+        ];
         stream = new MediaStream(tracks);
       } else {
         // Start audio recording
@@ -85,7 +99,7 @@ export function RecordingForm({ userId, folderId, recordingType }: RecordingForm
       }
 
       const mediaRecorder = new MediaRecorder(stream);
-      
+
       mediaRecorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           mediaChunksRef.current.push(event.data);
@@ -96,14 +110,14 @@ export function RecordingForm({ userId, folderId, recordingType }: RecordingForm
         if (timerRef.current) {
           clearInterval(timerRef.current);
         }
-        
+
         const blob = new Blob(mediaChunksRef.current, {
-          type: recordingType === 'screen' ? 'video/webm' : 'audio/webm',
+          type: recordingType === "screen" ? "video/webm" : "audio/webm",
         });
-        
+
         setRecordingBlob(blob);
         setIsRecording(false);
-        
+
         // Stop all tracks
         stream.getTracks().forEach((track) => track.stop());
       };
@@ -112,14 +126,14 @@ export function RecordingForm({ userId, folderId, recordingType }: RecordingForm
       mediaRecorder.start(1000); // Collect data every second
       mediaRecorderRef.current = mediaRecorder;
       setIsRecording(true);
-      
+
       // Start timer
       let seconds = 0;
       timerRef.current = setInterval(() => {
         seconds += 1;
         setDuration(seconds);
       }, 1000);
-      
+
       toast.success("Recording started");
     } catch (error) {
       console.error("Error starting recording:", error);
@@ -141,9 +155,13 @@ export function RecordingForm({ userId, folderId, recordingType }: RecordingForm
 
     try {
       // Create a File object from the Blob
-      const file = new File([recordingBlob], `${data.name}.${recordingType === 'screen' ? 'webm' : 'webm'}`, {
-        type: recordingType === 'screen' ? 'video/webm' : 'audio/webm',
-      });
+      const file = new File(
+        [recordingBlob],
+        `${data.name}.${recordingType === "screen" ? "webm" : "webm"}`,
+        {
+          type: recordingType === "screen" ? "video/webm" : "audio/webm",
+        },
+      );
 
       await saveRecording({
         userId,
@@ -153,7 +171,7 @@ export function RecordingForm({ userId, folderId, recordingType }: RecordingForm
         file,
         duration,
       });
-      
+
       toast.success("Recording saved successfully");
       router.push("/dashboard");
       router.refresh();
@@ -169,7 +187,9 @@ export function RecordingForm({ userId, folderId, recordingType }: RecordingForm
         {recordingBlob ? (
           <div className="w-full rounded-md border bg-muted p-4 text-center">
             <div className="mb-2 text-sm font-medium">Recording Complete</div>
-            <div className="text-xs text-muted-foreground">Duration: {formatTime(duration)}</div>
+            <div className="text-xs text-muted-foreground">
+              Duration: {formatTime(duration)}
+            </div>
           </div>
         ) : isRecording ? (
           <div className="flex w-full flex-col items-center gap-4 rounded-md border p-8">
@@ -192,12 +212,12 @@ export function RecordingForm({ userId, folderId, recordingType }: RecordingForm
             className="h-24 w-full gap-2 text-lg"
             size="lg"
           >
-            {recordingType === 'screen' ? (
+            {recordingType === "screen" ? (
               <MonitorIcon className="h-6 w-6" />
             ) : (
               <MicIcon className="h-6 w-6" />
             )}
-            Start {recordingType === 'screen' ? 'Screen' : 'Audio'} Recording
+            Start {recordingType === "screen" ? "Screen" : "Audio"} Recording
           </Button>
         )}
       </div>
@@ -238,4 +258,4 @@ export function RecordingForm({ userId, folderId, recordingType }: RecordingForm
       )}
     </div>
   );
-} 
+}

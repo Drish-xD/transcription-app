@@ -14,7 +14,7 @@ import Link from "next/link";
 interface Folder {
   id: string;
   name: string;
-  type: 'folder' | 'workspace';
+  type: "folder" | "workspace";
   createdAt: Date;
 }
 
@@ -46,7 +46,9 @@ function FolderItem({ folder }: { folder: Folder }) {
           <div className="font-medium">{folder.name}</div>
           <div className="text-xs text-muted-foreground">
             {folder.type.charAt(0).toUpperCase() + folder.type.slice(1)} •{" "}
-            {formatDistanceToNow(new Date(folder.createdAt), { addSuffix: true })}
+            {formatDistanceToNow(new Date(folder.createdAt), {
+              addSuffix: true,
+            })}
           </div>
         </div>
       </Link>
@@ -62,14 +64,10 @@ function FolderItem({ folder }: { folder: Folder }) {
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href={`/dashboard/folders/${folder.id}`}>
-                Open
-              </Link>
+              <Link href={`/dashboard/folders/${folder.id}`}>Open</Link>
             </DropdownMenuItem>
             <DropdownMenuItem asChild>
-              <Link href={`/dashboard/folders/${folder.id}/edit`}>
-                Rename
-              </Link>
+              <Link href={`/dashboard/folders/${folder.id}/edit`}>Rename</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="text-destructive">
@@ -80,4 +78,4 @@ function FolderItem({ folder }: { folder: Folder }) {
       </div>
     </div>
   );
-} 
+}

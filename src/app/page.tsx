@@ -26,8 +26,8 @@ export default function LandingPage() {
               Record and transcribe with ease
             </h1>
             <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-xl">
-              Create screen recordings and audio recordings directly in your browser, and automatically
-              transcribe them using advanced AI.
+              Create screen recordings and audio recordings directly in your
+              browser, and automatically transcribe them using advanced AI.
             </p>
           </div>
           <div className="flex flex-col gap-4 sm:flex-row">
@@ -64,7 +64,8 @@ export default function LandingPage() {
               </div>
               <h3 className="text-xl font-bold">Browser-based recording</h3>
               <p className="text-gray-500 dark:text-gray-400">
-                Record your screen and audio directly in your browser without any software installation.
+                Record your screen and audio directly in your browser without
+                any software installation.
               </p>
             </div>
             <div className="flex flex-col items-center gap-2 text-center">
@@ -88,7 +89,8 @@ export default function LandingPage() {
               </div>
               <h3 className="text-xl font-bold">AI-powered transcription</h3>
               <p className="text-gray-500 dark:text-gray-400">
-                Automatically transcribe your recordings with high accuracy using Gemini AI.
+                Automatically transcribe your recordings with high accuracy
+                using Gemini AI.
               </p>
             </div>
             <div className="flex flex-col items-center gap-2 text-center">
@@ -109,7 +111,8 @@ export default function LandingPage() {
               </div>
               <h3 className="text-xl font-bold">Organized content</h3>
               <p className="text-gray-500 dark:text-gray-400">
-                Keep your recordings and transcriptions organized with workspaces and folders.
+                Keep your recordings and transcriptions organized with
+                workspaces and folders.
               </p>
             </div>
           </div>
@@ -118,7 +121,8 @@ export default function LandingPage() {
       <footer className="border-t py-6">
         <div className="container flex flex-col items-center justify-between gap-4 px-4 md:flex-row">
           <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-            &copy; {new Date().getFullYear()} Transcription App. All rights reserved.
+            &copy; {new Date().getFullYear()} Transcription App. All rights
+            reserved.
           </p>
         </div>
       </footer>

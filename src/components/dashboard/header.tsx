@@ -3,12 +3,12 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { BellIcon, MenuIcon, PlusIcon } from "lucide-react";
@@ -29,12 +29,12 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   const [open, setOpen] = useState(false);
-  
+
   // Get initials from email
   const getInitials = (email: string) => {
     return email.charAt(0).toUpperCase();
   };
-  
+
   return (
     <header className="sticky top-0 z-10 border-b bg-background">
       <div className="flex h-16 items-center px-4">
@@ -56,7 +56,9 @@ export function Header({ user }: HeaderProps) {
         </div>
         <div className="flex flex-1 items-center justify-between">
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold md:hidden">Transcription App</h1>
+            <h1 className="text-lg font-semibold md:hidden">
+              Transcription App
+            </h1>
           </div>
           <div className="flex items-center gap-2">
             <DropdownMenu>
@@ -99,9 +101,7 @@ export function Header({ user }: HeaderProps) {
                   <Link href="/settings/api-key">API Key</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  Log out
-                </DropdownMenuItem>
+                <DropdownMenuItem>Log out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -109,4 +109,4 @@ export function Header({ user }: HeaderProps) {
       </div>
     </header>
   );
-} 
+}

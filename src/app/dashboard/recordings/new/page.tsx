@@ -1,6 +1,12 @@
 import { RecordingForm } from "@/components/recordings/recording-form";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { getCurrentUser } from "@/lib/auth";
 import { folderService } from "@/lib/services/folder-service";
 import { ChevronLeftIcon } from "lucide-react";
@@ -8,20 +14,20 @@ import Link from "next/link";
 
 export default async function NewRecordingPage() {
   const user = await getCurrentUser();
-  
+
   // Get all folders for the user
   const folders = await folderService.getRootFolders(user.id);
-  
+
   // If the user has no folders, create a default workspace
   let defaultFolderId: string;
-  
+
   if (folders.length === 0) {
     const defaultFolder = await folderService.createDefaultWorkspace(user.id);
     defaultFolderId = defaultFolder.id;
   } else {
     defaultFolderId = folders[0].id;
   }
-  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center">
@@ -33,7 +39,7 @@ export default async function NewRecordingPage() {
         </Button>
         <h1 className="text-2xl font-bold tracking-tight">New Recording</h1>
       </div>
-      
+
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -43,14 +49,14 @@ export default async function NewRecordingPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <RecordingForm 
+            <RecordingForm
               userId={user.id}
               folderId={defaultFolderId}
               recordingType="screen"
             />
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>Audio Recording</CardTitle>
@@ -59,7 +65,7 @@ export default async function NewRecordingPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <RecordingForm 
+            <RecordingForm
               userId={user.id}
               folderId={defaultFolderId}
               recordingType="audio"
@@ -69,4 +75,4 @@ export default async function NewRecordingPage() {
       </div>
     </div>
   );
-} 
+}

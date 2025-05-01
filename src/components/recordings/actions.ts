@@ -8,7 +8,7 @@ export interface SaveRecordingParams {
   userId: string;
   folderId: string;
   name: string;
-  type: 'screen' | 'audio';
+  type: "screen" | "audio";
   file: File;
   duration: number;
 }
@@ -36,7 +36,7 @@ export async function saveRecording({
       file,
       duration,
     });
-    
+
     // Step 2: Start the transcription process
     if (recording) {
       await transcriptionService.createTranscription({
@@ -44,9 +44,9 @@ export async function saveRecording({
         userId,
       });
     }
-    
+
     revalidatePath("/dashboard");
-    
+
     return { success: true, recordingId: recording.id };
   } catch (error) {
     console.error("Error saving recording:", error);
@@ -60,12 +60,12 @@ export async function updateTranscriptionContent({
 }: UpdateTranscriptionContentParams) {
   try {
     await transcriptionService.updateTranscriptionContent(id, content);
-    
+
     revalidatePath("/dashboard/recordings/[id]", "page");
-    
+
     return { success: true };
   } catch (error) {
     console.error("Error updating transcription:", error);
     throw new Error("Failed to update transcription");
   }
-} 
+}

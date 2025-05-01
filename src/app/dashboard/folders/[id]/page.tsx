@@ -17,24 +17,24 @@ interface FolderPageProps {
 
 export default async function FolderPage({ params }: FolderPageProps) {
   const user = await getCurrentUser();
-  
+
   // Get folder details
   const folder = await folderService.getFolder(params.id);
-  
+
   if (!folder || folder.userId !== user.id) {
     notFound();
   }
-  
+
   // Get child folders and recordings
   const childFolders = await folderService.getChildFolders(folder.id);
   const recordings = await recordingService.getFolderRecordings(folder.id);
-  
+
   // Get breadcrumb path
   const breadcrumbs = [
     { name: "Folders", href: "/dashboard/folders" },
     { name: folder.name, href: `/dashboard/folders/${folder.id}` },
   ];
-  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center">
@@ -48,10 +48,16 @@ export default async function FolderPage({ params }: FolderPageProps) {
           <div className="flex items-center gap-2">
             {breadcrumbs.map((breadcrumb, index) => (
               <div key={breadcrumb.href} className="flex items-center">
-                {index > 0 && <span className="mx-2 text-muted-foreground">/</span>}
+                {index > 0 && (
+                  <span className="mx-2 text-muted-foreground">/</span>
+                )}
                 <Link
                   href={breadcrumb.href}
-                  className={index === breadcrumbs.length - 1 ? "font-medium" : "text-muted-foreground hover:text-foreground"}
+                  className={
+                    index === breadcrumbs.length - 1
+                      ? "font-medium"
+                      : "text-muted-foreground hover:text-foreground"
+                  }
                 >
                   {breadcrumb.name}
                 </Link>
@@ -61,7 +67,7 @@ export default async function FolderPage({ params }: FolderPageProps) {
           <h1 className="text-2xl font-bold tracking-tight">{folder.name}</h1>
         </div>
       </div>
-      
+
       <div className="flex items-center justify-end gap-2">
         <Link href={`/dashboard/folders/new?parentId=${folder.id}`}>
           <Button size="sm" variant="outline" className="h-9">
@@ -76,7 +82,7 @@ export default async function FolderPage({ params }: FolderPageProps) {
           </Button>
         </Link>
       </div>
-      
+
       {childFolders.length > 0 && (
         <Card>
           <CardHeader>
@@ -87,7 +93,7 @@ export default async function FolderPage({ params }: FolderPageProps) {
           </CardContent>
         </Card>
       )}
-      
+
       <Card>
         <CardHeader>
           <CardTitle>Recordings</CardTitle>
@@ -98,4 +104,4 @@ export default async function FolderPage({ params }: FolderPageProps) {
       </Card>
     </div>
   );
-} 
+}
