@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { signOut } from "@/lib/auth/actions";
 import { cn } from "@/lib/utils";
 import {
   FolderIcon,
@@ -70,8 +71,7 @@ export function Sidebar() {
           />
           <form
             action={async () => {
-              // This would be a server action to log out
-              // await signOut();
+              await signOut();
               toast.success("Logged out successfully");
             }}
           >

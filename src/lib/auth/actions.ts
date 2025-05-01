@@ -17,28 +17,6 @@ export async function getCurrentUser() {
   return session.user;
 }
 
-// Helper function to check if the user has completed onboarding
-export async function requireCompletedOnboarding() {
-  const user = await getCurrentUser();
-
-  if (!user.hasCompletedOnboarding) {
-    redirect("/onboarding");
-  }
-
-  return user;
-}
-
-// Helper function to check if the user has an API key
-export async function requireApiKey() {
-  const user = await getCurrentUser();
-
-  if (!user.hasApiKey) {
-    redirect("/settings/api-key");
-  }
-
-  return user;
-}
-
 // Sign in with email/password
 export async function signIn(email: string, password: string) {
   try {

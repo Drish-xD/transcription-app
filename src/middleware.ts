@@ -1,19 +1,19 @@
-import { auth } from "@/lib/auth";
+import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse, type NextRequest } from "next/server";
 
 const AUTH_ROUTES = ["/login", "/register"];
 
 export async function middleware(request: NextRequest) {
-  const session = await auth.api.getSession({ headers: request.headers });
+  const session = getSessionCookie(request);
   const pathname = request.nextUrl.pathname;
 
   if (!session && !AUTH_ROUTES.includes(pathname)) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (session && AUTH_ROUTES.includes(pathname)) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
+  // if (session && AUTH_ROUTES.includes(pathname)) {
+  //   return NextResponse.redirect(new URL("/dashboard", request.url));
+  // }
 
   return NextResponse.next();
 }

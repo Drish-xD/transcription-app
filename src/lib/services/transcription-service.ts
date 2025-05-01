@@ -3,21 +3,12 @@ import { eq } from "drizzle-orm";
 import { ai } from "../ai";
 import { db, supabaseClient } from "../db";
 import { recordings, transcriptions } from "../db/schema";
-import { userService } from "./user-service";
-
-export interface CreateTranscriptionParams {
-  recordingId: string;
-  userId: string;
-}
 
 export const transcriptionService = {
   /**
    * Create a new transcription job
    */
-  async createTranscription({
-    recordingId,
-    userId,
-  }: CreateTranscriptionParams) {
+  async createTranscription(recordingId: string) {
     // Check if a transcription already exists for this recording
     const existing = await db
       .select()
@@ -38,7 +29,7 @@ export const transcriptionService = {
       .returning();
 
     // Enqueue the transcription job (simulated here)
-    void this.processTranscription(transcription.id, userId);
+    void this.processTranscription(transcription.id);
 
     return transcription;
   },
@@ -46,7 +37,7 @@ export const transcriptionService = {
   /**
    * Process the transcription using Gemini AI
    */
-  async processTranscription(transcriptionId: string, userId: string) {
+  async processTranscription(transcriptionId: string) {
     try {
       // Update status to processing
       await db
@@ -69,12 +60,6 @@ export const transcriptionService = {
       }
 
       const { recording } = transcriptionWithRecording;
-
-      // Get the user's Gemini API key
-      const apiKey = await userService.getApiKey(userId);
-      if (!apiKey) {
-        throw new Error("No API key found for user");
-      }
 
       // Fetch the audio file from storage
       const audioFile = await supabaseClient.storage

@@ -19,7 +19,7 @@ export default async function FolderPage({ params }: FolderPageProps) {
   const user = await getCurrentUser();
 
   // Get folder details
-  const folder = await folderService.getFolder(params.id);
+  const folder = await folderService.getFolder(await params.id);
 
   if (!folder || folder.userId !== user.id) {
     notFound();

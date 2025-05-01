@@ -16,6 +16,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -39,6 +40,8 @@ export default function SignUp() {
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const {
     register,
@@ -68,10 +71,13 @@ export default function SignUp() {
         password: data.password,
         name: `${data.firstName} ${data.lastName}`,
         image: image ? await convertImageToBase64(image) : "",
-        callbackURL: "/dashboard",
+        callbackURL: "/login",
         fetchOptions: {
           onRequest: () => setLoading(true),
           onResponse: () => setLoading(false),
+          onSuccess: () => {
+            router.replace("/login");
+          },
         },
       });
     } catch (error) {
@@ -81,7 +87,7 @@ export default function SignUp() {
   };
 
   return (
-    <Card className="z-50 rounded-md rounded-t-none max-w-md">
+    <Card className="max-w-md flex-1">
       <CardHeader>
         <CardTitle className="text-lg md:text-xl">Sign Up</CardTitle>
         <CardDescription className="text-xs md:text-sm">

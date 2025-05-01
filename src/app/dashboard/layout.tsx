@@ -1,14 +1,13 @@
 import { Header } from "@/components/dashboard/header";
 import { Sidebar } from "@/components/dashboard/sidebar";
-import { requireApiKey } from "@/lib/auth/actions";
+import { getCurrentUser } from "@/lib/auth/actions";
 
 export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Make sure the user has an API key set up
-  const user = await requireApiKey();
+  const user = await getCurrentUser();
 
   return (
     <div className="flex h-screen bg-background">

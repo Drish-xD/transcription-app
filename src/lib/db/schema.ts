@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   AnyPgColumn,
   boolean,
@@ -8,7 +8,6 @@ import {
   pgTable,
   text,
   timestamp,
-  uuid,
 } from "drizzle-orm/pg-core";
 
 // Enums
@@ -22,34 +21,66 @@ export const transcriptionStatusEnum = pgEnum("transcription_status", [
 ]);
 
 // Users Table
-export const users = pgTable("users", {
-  id: uuid().primaryKey().defaultRandom(),
+export const user = pgTable("user", {
+  id: text().primaryKey(),
+  name: text().notNull(),
   email: text().notNull().unique(),
-  hasCompletedOnboarding: boolean().default(false),
-  hasApiKey: boolean().default(false),
+  emailVerified: boolean().notNull(),
+  image: text(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
+  isAnonymous: boolean(),
+});
+
+export const session = pgTable("session", {
+  id: text().primaryKey(),
+  expiresAt: timestamp().notNull(),
+  token: text().notNull().unique(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
+  ipAddress: text(),
+  userAgent: text(),
+  userId: text()
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+});
+
+export const account = pgTable("account", {
+  id: text().primaryKey(),
+  accountId: text().notNull(),
+  providerId: text().notNull(),
+  userId: text()
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  accessToken: text(),
+  refreshToken: text(),
+  idToken: text(),
+  accessTokenExpiresAt: timestamp(),
+  refreshTokenExpiresAt: timestamp(),
+  scope: text(),
+  password: text(),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
 });
 
-// User API Keys Table
-export const userApiKeys = pgTable("user_api_keys", {
-  id: uuid().primaryKey().defaultRandom(),
-  userId: uuid()
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  provider: text().notNull().default("gemini"),
-  apiKey: text().notNull(),
+export const verification = pgTable("verification", {
+  id: text().primaryKey(),
+  identifier: text().notNull(),
+  value: text().notNull(),
+  expiresAt: timestamp().notNull(),
   createdAt: timestamp().defaultNow().notNull(),
   updatedAt: timestamp().defaultNow().notNull(),
 });
 
 // Folders Table
 export const folders = pgTable("folders", {
-  id: uuid().primaryKey().defaultRandom(),
-  userId: uuid()
+  id: text()
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: text()
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  parentId: uuid().references((): AnyPgColumn => folders.id, {
+    .references(() => user.id, { onDelete: "cascade" }),
+  parentId: text().references((): AnyPgColumn => folders.id, {
     onDelete: "cascade",
   }),
   name: text().notNull(),
@@ -68,11 +99,13 @@ export interface RecordingMetadata {
 
 // Recordings Table
 export const recordings = pgTable("recordings", {
-  id: uuid().primaryKey().defaultRandom(),
-  userId: uuid()
+  id: text()
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  userId: text()
     .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  folderId: uuid()
+    .references(() => user.id, { onDelete: "cascade" }),
+  folderId: text()
     .notNull()
     .references(() => folders.id, { onDelete: "cascade" }),
   name: text().notNull(),
@@ -87,8 +120,10 @@ export const recordings = pgTable("recordings", {
 
 // Transcriptions Table
 export const transcriptions = pgTable("transcriptions", {
-  id: uuid().primaryKey().defaultRandom(),
-  recordingId: uuid()
+  id: text()
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
+  recordingId: text()
     .notNull()
     .references(() => recordings.id, { onDelete: "cascade" }),
   content: text(),
@@ -99,23 +134,17 @@ export const transcriptions = pgTable("transcriptions", {
   updatedAt: timestamp().defaultNow().notNull(),
 });
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(user, ({ many }) => ({
   folders: many(folders),
   recordings: many(recordings),
-  apiKeys: many(userApiKeys),
-}));
-
-export const userApiKeysRelations = relations(userApiKeys, ({ one }) => ({
-  user: one(users, {
-    fields: [userApiKeys.userId],
-    references: [users.id],
-  }),
+  sessions: many(session),
+  accounts: many(account),
 }));
 
 export const foldersRelations = relations(folders, ({ one, many }) => ({
-  user: one(users, {
+  user: one(user, {
     fields: [folders.userId],
-    references: [users.id],
+    references: [user.id],
   }),
   parent: one(folders, {
     fields: [folders.parentId],
@@ -126,9 +155,9 @@ export const foldersRelations = relations(folders, ({ one, many }) => ({
 }));
 
 export const recordingsRelations = relations(recordings, ({ one, many }) => ({
-  user: one(users, {
+  user: one(user, {
     fields: [recordings.userId],
-    references: [users.id],
+    references: [user.id],
   }),
   folder: one(folders, {
     fields: [recordings.folderId],

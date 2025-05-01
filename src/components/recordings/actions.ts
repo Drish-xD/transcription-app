@@ -1,8 +1,8 @@
-"use server";
+'use server';
 
 import { recordingService } from "@/lib/services/recording-service";
 import { transcriptionService } from "@/lib/services/transcription-service";
-import { revalidatePath } from "next/cache";
+// import { revalidatePath } from "next/cache";
 
 export interface SaveRecordingParams {
   userId: string;
@@ -35,17 +35,18 @@ export async function saveRecording({
       type,
       file,
       duration,
+      metadata: {
+        mimeType: file.type,
+        duration: duration,
+      },
     });
 
     // Step 2: Start the transcription process
     if (recording) {
-      await transcriptionService.createTranscription({
-        recordingId: recording.id,
-        userId,
-      });
+      await transcriptionService.createTranscription(recording.id);
     }
 
-    revalidatePath("/dashboard");
+    // revalidatePath("/dashboard");
 
     return { success: true, recordingId: recording.id };
   } catch (error) {
@@ -61,7 +62,7 @@ export async function updateTranscriptionContent({
   try {
     await transcriptionService.updateTranscriptionContent(id, content);
 
-    revalidatePath("/dashboard/recordings/[id]", "page");
+    // revalidatePath("/dashboard/recordings/[id]", "page");
 
     return { success: true };
   } catch (error) {

@@ -1,4 +1,4 @@
-import { getCurrentUser, signOut } from "@/lib/auth/actions";
+import { getCurrentUser } from "@/lib/auth/actions";
 import { Metadata } from "next";
 import Link from "next/link";
 
@@ -11,23 +11,8 @@ export default async function DashboardPage() {
   const user = await getCurrentUser();
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <form
-          action={async () => {
-            "use server";
-            await signOut();
-          }}
-        >
-          <button
-            type="submit"
-            className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
-          >
-            Sign Out
-          </button>
-        </form>
-      </div>
+    <div className="container mx-auto">
+      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
 
       <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
         <h2 className="mb-4 text-xl font-semibold">Welcome back!</h2>
@@ -56,14 +41,6 @@ export default async function DashboardPage() {
                   className="text-primary hover:underline"
                 >
                   Manage Folders
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/settings/api-key"
-                  className="text-primary hover:underline"
-                >
-                  API Key Settings
                 </Link>
               </li>
             </ul>

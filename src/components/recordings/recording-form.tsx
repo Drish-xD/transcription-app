@@ -43,6 +43,7 @@ export function RecordingForm({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaChunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(0);
 
   const form = useForm<RecordingFormValues>({
     resolver: zodResolver(recordingFormSchema),
@@ -51,24 +52,47 @@ export function RecordingForm({
     },
   });
 
-  // Clean up on unmount
+  // Format seconds to MM:SS
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
+  // Timer effect to update duration when recording
   useEffect(() => {
+    let intervalId: NodeJS.Timeout | null = null;
+
+    if (isRecording) {
+      // Store start time when recording begins
+      startTimeRef.current = Date.now();
+
+      // Update duration every second
+      intervalId = setInterval(() => {
+        const elapsedSeconds = Math.floor(
+          (Date.now() - startTimeRef.current) / 1000
+        );
+        setDuration(elapsedSeconds);
+      }, 1000);
+
+      timerRef.current = intervalId;
+    } else if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+
+    // Clean up on unmount or when recording state changes
     return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
+      if (intervalId) {
+        clearInterval(intervalId);
       }
+
+      // Also stop recording if component unmounts while recording
       if (mediaRecorderRef.current && isRecording) {
         mediaRecorderRef.current.stop();
       }
     };
   }, [isRecording]);
-
-  // Format seconds to MM:SS
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
 
   const startRecording = async () => {
     try {
@@ -123,16 +147,11 @@ export function RecordingForm({
       };
 
       // Start recording
-      mediaRecorder.start(1000); // Collect data every second
+      mediaRecorder.start(1000);
       mediaRecorderRef.current = mediaRecorder;
-      setIsRecording(true);
 
-      // Start timer
-      let seconds = 0;
-      timerRef.current = setInterval(() => {
-        seconds += 1;
-        setDuration(seconds);
-      }, 1000);
+      setDuration(0);
+      setIsRecording(true);
 
       toast.success("Recording started");
     } catch (error) {
@@ -144,6 +163,7 @@ export function RecordingForm({
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
+      setIsRecording(false);
     }
   };
 
@@ -160,7 +180,7 @@ export function RecordingForm({
         `${data.name}.${recordingType === "screen" ? "webm" : "webm"}`,
         {
           type: recordingType === "screen" ? "video/webm" : "audio/webm",
-        },
+        }
       );
 
       await saveRecording({
