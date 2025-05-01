@@ -34,147 +34,65 @@ alwaysApply: false
 - **Jest & React Testing Library**: For testing
 - **Vercel**: For deployment and hosting
 
-# Project Structure
+# Current Project Structure
 
 ```
-src/
-├── app/                   # Next.js App Router
-│   ├── (auth)/            # Authentication routes (grouped)
-│   │   ├── login/         # Login page
-│   │   │   └── page.tsx   # Login page component
-│   │   ├── register/      # Registration page
-│   │   │   └── page.tsx   # Registration page component
-│   │   └── onboarding/    # First-time setup
-│   │       └── page.tsx   # Onboarding page component
-│   ├── (dashboard)/       # Protected dashboard routes (grouped)
-│   │   ├── layout.tsx     # Dashboard layout with navigation
-│   │   ├── page.tsx       # Main dashboard page
-│   │   ├── recordings/    # Recordings section
-│   │   │   ├── page.tsx   # Recordings list page with folders
-│   │   │   └── folders/   # Folder navigation
-│   │   │       └── [id]/  # Individual folder page
-│   │   │           └── page.tsx
-│   │   └── settings/      # User settings
-│   │       └── page.tsx   # Settings page component
-│   ├── layout.tsx         # Root layout
-│   └── page.tsx           # Landing page
-├── components/            # React components
-│   ├── ui/                # shadcn/ui components
-│   ├── auth/              # Authentication components
-│   │   ├── login-form.tsx
-│   │   ├── register-form.tsx
-│   │   └── api-key-form.tsx
-│   ├── dashboard/         # Dashboard components
-│   │   ├── sidebar.tsx
-│   │   ├── header.tsx
-│   │   └── user-menu.tsx
-│   ├── recordings/        # Recording components
-│   │   ├── recorder.tsx
-│   │   ├── recording-card.tsx
-│   │   ├── recording-list.tsx
-│   │   ├── recording-player.tsx
-│   │   ├── folder-view.tsx
-│   │   ├── folder-card.tsx
-│   │   └── folder-navigation.tsx
-│   └── transcription/     # Transcription components
-│       ├── transcription-view.tsx
-│       └── transcription-controls.tsx
-├── lib/                   # Utility functions and libraries
-│   ├── db/                # Database utilities
-│   │   ├── schema.ts      # Drizzle schema definitions
-│   │   └── index.ts       # Database connection setup
-│   ├── actions/           # Server actions
-│   │   ├── auth.ts        # Authentication actions
-│   │   ├── recordings.ts  # Recording management actions
-│   │   ├── transcription.ts # Transcription actions
-│   │   └── folders.ts     # Folder management actions
-│   ├── api/               # API utilities
-│   │   ├── gemini.ts      # Gemini API wrapper
-│   │   └── supabase.ts    # Supabase client
-│   ├── auth/              # Auth utilities
-│   │   └── auth.ts        # Better Auth setup
-│   └── utils/             # General utilities
-│       ├── recording.ts   # Recording utilities
-│       ├── file.ts        # File handling utilities
-│       └── formatting.ts  # Text/data formatting utilities
-├── types/                 # TypeScript types
-│   ├── auth.ts            # Auth-related types
-│   ├── recording.ts       # Recording-related types
-│   ├── transcription.ts   # Transcription-related types
-│   └── folder.ts          # Folder-related types
-├── constants/             # Constants
-│   ├── app.ts             # App-wide constants
-│   └── api.ts             # API-related constants
-└── styles/                # Styling
-    ├── globals.css        # Global styles (Tailwind)
-    └── fonts.ts           # Google fonts exports
+project-dir
+|   .gitignore
+|   components.json
+|   eslint.config.mjs
+|   next-env.d.ts
+|   next.config.ts
+|   package.json
+|   pnpm-lock.yaml
+|   postcss.config.mjs
+|   README.md
+|   tsconfig.json
+|           
+\---src
+    +---app
+    |       favicon.ico
+    |       layout.tsx
+    |       page.tsx
+    |       
+    +---components
+    |   \---ui
+    |           alert.tsx
+    |           avatar.tsx
+    |           badge.tsx
+    |           breadcrumb.tsx
+    |           button.tsx
+    |           card.tsx
+    |           checkbox.tsx
+    |           context-menu.tsx
+    |           dialog.tsx
+    |           dropdown-menu.tsx
+    |           form.tsx
+    |           input.tsx
+    |           label.tsx
+    |           navigation-menu.tsx
+    |           progress.tsx
+    |           select.tsx
+    |           separator.tsx
+    |           sheet.tsx
+    |           slider.tsx
+    |           sonner.tsx
+    |           switch.tsx
+    |           table.tsx
+    |           tabs.tsx
+    |           
+    +---lib
+    |       utils.ts
+    |       
+    \---styles
+            globals.css            
 ```
 
-# Database Schema
-Using Drizzle ORM with PostgreSQL
+# Steps to build
 
-```typescript
-// src/lib/db/schema.ts
-import { pgTable, uuid, text, timestamp, boolean, integer, pgEnum } from 'drizzle-orm/pg-core';
-import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
-import { z } from 'zod';
+1. Setup a schema structure needed for the application inside /lib/db dir using drizzle.
+2. Guide me to setup the supabase for this.
+3. Setup the Better-Auth for authentication and connect the db with it via adapter. And use inbuild components for login, signup etc forms.
+4. Create a Service layer where all the actions and serices needed will be written.
+5. Now create routes and components needed for the for the application
 
-// Enums
-export const recordingTypeEnum = pgEnum('recording_type', ['screen', 'audio', 'screen_audio']);
-export const transcriptionStatusEnum = pgEnum('transcription_status', ['pending', 'completed', 'failed']);
-
-// Users Table
-export const users = pgTable('users', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  email: text('email').notNull().unique(),
-  geminiApiKey: text('gemini_api_key'),
-  hasApiKey: boolean('has_api_key').default(false),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
-});
-
-// Folders Table
-export const folders = pgTable('folders', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').notNull(),
-  parentFolderId: uuid('parent_folder_id').references(() => folders.id, { onDelete: 'cascade' }),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
-});
-
-// Recordings Table
-export const recordings = pgTable('recordings', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  name: text('name').notNull(),
-  type: recordingTypeEnum('type').notNull(),
-  filePath: text('file_path').notNull(),
-  fileSize: integer('file_size'),
-  duration: integer('duration'), // duration in seconds
-  folderId: uuid('folder_id').references(() => folders.id, { onDelete: 'set null' }),
-  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
-});
-
-// Transcriptions Table
-export const transcriptions = pgTable('transcriptions', {
-  id: uuid('id').primaryKey().defaultRandom(),
-  recordingId: uuid('recording_id').notNull().references(() => recordings.id, { onDelete: 'cascade' }),
-  text: text('text'),
-  status: transcriptionStatusEnum('status').notNull().default('pending'),
-  createdAt: timestamp('created_at').defaultNow(),
-  updatedAt: timestamp('updated_at').defaultNow()
-});
-
-// Insert and select schemas for Zod validation
-export const insertUserSchema = createInsertSchema(users);
-export const selectUserSchema = createSelectSchema(users);
-export const insertFolderSchema = createInsertSchema(folders);
-export const selectFolderSchema = createSelectSchema(folders);
-export const insertRecordingSchema = createInsertSchema(recordings);
-export const selectRecordingSchema = createSelectSchema(recordings);
-export const insertTranscriptionSchema = createInsertSchema(transcriptions);
-export const selectTranscriptionSchema = createSelectSchema(transcriptions);
-
-```
