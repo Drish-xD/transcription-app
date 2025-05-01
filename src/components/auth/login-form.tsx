@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { signIn } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2 } from "lucide-react";
+import { Loader2, VenetianMask } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -57,6 +57,25 @@ export default function LoginForm() {
       );
     } catch (error) {
       console.error("Error : ", error);
+      setLoading(false);
+    }
+  };
+
+  const handleAnonymousLogin = async () => {
+    setLoading(true);
+    try {
+      await signIn.anonymous(
+        {},
+        {
+          onRequest: () => setLoading(true),
+          onResponse: () => setLoading(false),
+          onSuccess: () => {
+            router.replace("/dashboard");
+          },
+        },
+      );
+    } catch (error) {
+      console.error("Error:", error);
       setLoading(false);
     }
   };
@@ -108,11 +127,32 @@ export default function LoginForm() {
             )}
           </Button>
 
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
+            </div>
+          </div>
+
           <div
             className={cn(
               "w-full gap-2 flex items-center justify-between flex-col",
             )}
           >
+            <Button
+              variant="outline"
+              className={cn("w-full gap-2")}
+              disabled={loading}
+              onClick={handleAnonymousLogin}
+            >
+              <VenetianMask className="h-4 w-4" />
+              Continue as Guest
+            </Button>
+
             <Button
               variant="outline"
               className={cn("w-full gap-2")}
