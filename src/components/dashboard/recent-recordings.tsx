@@ -1,19 +1,12 @@
 import { Button } from "@/components/ui/button";
+import { recordings } from "@/lib/db/schema";
 import { formatDistanceToNow } from "date-fns";
+import { InferSelectModel } from "drizzle-orm";
 import { ClockIcon, DownloadIcon, PlayIcon } from "lucide-react";
 import Link from "next/link";
 
-interface Recording {
-  id: string;
-  name: string;
-  type: "audio" | "screen";
-  duration?: number;
-  createdAt: Date;
-  fileUrl: string;
-}
-
 interface RecentRecordingsProps {
-  recordings: Recording[];
+  recordings: InferSelectModel<typeof recordings>[];
 }
 
 export function RecentRecordings({ recordings }: RecentRecordingsProps) {

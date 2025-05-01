@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Textarea } from "@/components/ui/textarea";
+import { transcriptions } from "@/lib/db/schema";
+import { InferSelectModel } from "drizzle-orm";
 import {
   CopyIcon,
   DownloadIcon,
@@ -14,18 +16,8 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 import { updateTranscriptionContent } from "./actions";
-
-interface Transcription {
-  id: string;
-  recordingId: string;
-  content: string | null;
-  status: "pending" | "processing" | "completed" | "failed";
-  language?: string;
-  createdAt: Date;
-}
-
 interface TranscriptionViewerProps {
-  transcription: Transcription;
+  transcription: InferSelectModel<typeof transcriptions>;
 }
 
 export function TranscriptionViewer({

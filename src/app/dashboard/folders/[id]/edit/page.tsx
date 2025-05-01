@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth/actions";
 import { folderService } from "@/lib/services/folder-service";
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
@@ -44,7 +44,9 @@ export default async function EditFolderPage({ params }: EditFolderPageProps) {
       <Card className="mx-auto max-w-lg">
         <CardHeader>
           <CardTitle>Edit {folder.name}</CardTitle>
-          <CardDescription>Update the folder's information</CardDescription>
+          <CardDescription>
+            Update the folder&apos;s information
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <FolderEditForm folderId={folder.id} initialName={folder.name} />

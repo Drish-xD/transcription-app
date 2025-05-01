@@ -1,5 +1,5 @@
 import { ApiKeyForm } from "@/components/onboarding/api-key-form";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth/actions";
 import { redirect } from "next/navigation";
 
 export default async function OnboardingPage() {

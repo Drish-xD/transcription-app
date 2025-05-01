@@ -2,7 +2,7 @@ import { RecentRecordings } from "@/components/dashboard/recent-recordings";
 import { FolderList } from "@/components/folders/folder-list";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth/actions";
 import { folderService } from "@/lib/services/folder-service";
 import { recordingService } from "@/lib/services/recording-service";
 import { ChevronLeftIcon, PlusIcon } from "lucide-react";

@@ -1,102 +1,74 @@
-import { RecentRecordings } from "@/components/dashboard/recent-recordings";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCurrentUser } from "@/lib/auth";
-import { folderService } from "@/lib/services/folder-service";
-import { recordingService } from "@/lib/services/recording-service";
-import { FolderIcon, MicIcon, PlusIcon } from "lucide-react";
+import { getCurrentUser, signOut } from "@/lib/auth/actions";
+import { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Dashboard | Transcription App",
+  description: "Manage your transcriptions",
+};
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
 
-  // Get recent recordings
-  const recentRecordings = await recordingService.getRecentRecordings(user.id);
-
-  // Get root folders
-  const rootFolders = await folderService.getRootFolders(user.id);
-
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
-        <div className="flex gap-2">
-          <Link href="/dashboard/recordings/new">
-            <Button size="sm" className="h-9">
-              <PlusIcon className="mr-2 h-4 w-4" />
-              New Recording
-            </Button>
-          </Link>
-        </div>
-      </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Recordings
-            </CardTitle>
-            <MicIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{recentRecordings.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Folders</CardTitle>
-            <FolderIcon className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{rootFolders.length}</div>
-          </CardContent>
-        </Card>
+    <div className="container mx-auto py-8">
+      <div className="mb-8 flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Dashboard</h1>
+        <form
+          action={async () => {
+            "use server";
+            await signOut();
+          }}
+        >
+          <button
+            type="submit"
+            className="rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600"
+          >
+            Sign Out
+          </button>
+        </form>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Recent Recordings</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <RecentRecordings recordings={recentRecordings} />
-          </CardContent>
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Workspaces</CardTitle>
-            <Link href="/dashboard/folders/new">
-              <Button variant="ghost" size="sm" className="gap-1">
-                <PlusIcon className="h-4 w-4" />
-                New
-              </Button>
-            </Link>
-          </CardHeader>
-          <CardContent>
-            {rootFolders.length > 0 ? (
-              <div className="space-y-2">
-                {rootFolders.map((folder) => (
-                  <Link
-                    key={folder.id}
-                    href={`/dashboard/folders/${folder.id}`}
-                    className="flex items-center gap-2 rounded-md p-2 hover:bg-accent"
-                  >
-                    <FolderIcon className="h-4 w-4 text-muted-foreground" />
-                    <span>{folder.name}</span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-md border border-dashed p-4 text-center text-sm text-muted-foreground">
-                <p>No workspaces or folders yet</p>
-                <Link href="/dashboard/folders/new">
-                  <Button variant="link" size="sm" className="mt-2">
-                    Create your first folder
-                  </Button>
+      <div className="rounded-lg border border-border bg-card p-6 shadow-sm">
+        <h2 className="mb-4 text-xl font-semibold">Welcome back!</h2>
+        <div className="mb-4 flex items-center space-x-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Email</p>
+            <p className="font-medium">{user.email}</p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-md border border-border bg-background p-4">
+            <h3 className="font-medium">Quick Actions</h3>
+            <ul className="mt-2 space-y-2">
+              <li>
+                <Link
+                  href="/dashboard/recordings/new"
+                  className="text-primary hover:underline"
+                >
+                  New Recording
                 </Link>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              </li>
+              <li>
+                <Link
+                  href="/dashboard/folders"
+                  className="text-primary hover:underline"
+                >
+                  Manage Folders
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/settings/api-key"
+                  className="text-primary hover:underline"
+                >
+                  API Key Settings
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -13,9 +13,12 @@ import Link from "next/link";
 
 interface Folder {
   id: string;
+  userId: string;
+  parentId: string | null;
   name: string;
   type: "folder" | "workspace";
   createdAt: Date;
+  updatedAt: Date;
 }
 
 interface FolderListProps {

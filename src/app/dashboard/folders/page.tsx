@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth/actions";
 import { folderService } from "@/lib/services/folder-service";
 import { FolderIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";

@@ -1,7 +1,7 @@
 import { TranscriptionViewer } from "@/components/recordings/transcription-viewer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth/actions";
 import { recordingService } from "@/lib/services/recording-service";
 import { transcriptionService } from "@/lib/services/transcription-service";
 import { formatDistanceToNow } from "date-fns";

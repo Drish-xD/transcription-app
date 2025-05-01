@@ -11,20 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import type { auth } from "@/lib/auth";
 import { BellIcon, MenuIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
 
-interface User {
-  id: string;
-  email: string;
-  hasCompletedOnboarding: boolean;
-  hasApiKey: boolean;
-}
-
 interface HeaderProps {
-  user: User;
+  user: typeof auth.$Infer.Session.user;
 }
 
 export function Header({ user }: HeaderProps) {

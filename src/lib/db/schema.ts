@@ -27,8 +27,8 @@ export const users = pgTable("users", {
   email: text().notNull().unique(),
   hasCompletedOnboarding: boolean().default(false),
   hasApiKey: boolean().default(false),
-  createdAt: timestamp().defaultNow(),
-  updatedAt: timestamp().defaultNow(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
 });
 
 // User API Keys Table
@@ -39,8 +39,8 @@ export const userApiKeys = pgTable("user_api_keys", {
     .references(() => users.id, { onDelete: "cascade" }),
   provider: text().notNull().default("gemini"),
   apiKey: text().notNull(),
-  createdAt: timestamp().defaultNow(),
-  updatedAt: timestamp().defaultNow(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
 });
 
 // Folders Table
@@ -54,8 +54,8 @@ export const folders = pgTable("folders", {
   }),
   name: text().notNull(),
   type: folderTypeEnum().notNull().default("folder"),
-  createdAt: timestamp().defaultNow(),
-  updatedAt: timestamp().defaultNow(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
 });
 
 export interface RecordingMetadata {
@@ -77,12 +77,12 @@ export const recordings = pgTable("recordings", {
     .references(() => folders.id, { onDelete: "cascade" }),
   name: text().notNull(),
   type: recordingTypeEnum().notNull(),
-  duration: integer(), // in seconds
+  duration: integer().notNull().default(0),
   fileUrl: text().notNull(),
   thumbnailUrl: text(),
   metadata: jsonb().notNull().$type<RecordingMetadata | null>(),
-  createdAt: timestamp().defaultNow(),
-  updatedAt: timestamp().defaultNow(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
 });
 
 // Transcriptions Table
@@ -95,8 +95,8 @@ export const transcriptions = pgTable("transcriptions", {
   status: transcriptionStatusEnum().notNull().default("pending"),
   language: text(),
   metadata: jsonb(),
-  createdAt: timestamp().defaultNow(),
-  updatedAt: timestamp().defaultNow(),
+  createdAt: timestamp().defaultNow().notNull(),
+  updatedAt: timestamp().defaultNow().notNull(),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

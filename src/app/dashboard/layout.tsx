@@ -1,6 +1,6 @@
 import { Header } from "@/components/dashboard/header";
 import { Sidebar } from "@/components/dashboard/sidebar";
-import { requireApiKey } from "@/lib/auth";
+import { requireApiKey } from "@/lib/auth/actions";
 
 export default async function DashboardLayout({
   children,
