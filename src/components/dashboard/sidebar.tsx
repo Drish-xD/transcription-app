@@ -3,13 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { signOut } from "@/lib/auth/actions";
 import { cn } from "@/lib/utils";
-import {
-  FolderIcon,
-  HomeIcon,
-  LogOutIcon,
-  MicIcon,
-  SettingsIcon,
-} from "lucide-react";
+import { FolderIcon, HomeIcon, LogOutIcon, MicIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { toast } from "sonner";
@@ -20,7 +14,7 @@ interface SidebarItemProps {
   title: string;
 }
 
-export function Sidebar() {
+export function Sidebar({ open }: { open?: boolean }) {
   const pathname = usePathname();
 
   function SidebarItem({ href, icon, title }: SidebarItemProps) {
@@ -41,7 +35,12 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden w-64 border-r bg-card md:block">
+    <aside
+      className={cn(
+        "hidden h-full md:w-64 border-r bg-card md:block",
+        open && "block",
+      )}
+    >
       <div className="flex h-full flex-col px-3 py-4">
         <div className="mb-6 px-2">
           <h2 className="text-lg font-semibold">Transcription App</h2>
@@ -64,11 +63,6 @@ export function Sidebar() {
           />
         </nav>
         <div className="mt-auto space-y-1">
-          <SidebarItem
-            href="/settings"
-            icon={<SettingsIcon className="h-4 w-4" />}
-            title="Settings"
-          />
           <form
             action={async () => {
               await signOut();

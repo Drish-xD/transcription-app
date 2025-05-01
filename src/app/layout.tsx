@@ -1,4 +1,4 @@
-import { ThemeProvider } from "@/components/providers/theme-provider";
+import { ThemeProvider } from "@/components/theme/theme-provider";
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -16,25 +16,20 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Transcription App",
-  description: "Record and transcribe audio and screen recordings",
+  description: "A modern transcription app built with Next.js",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} min-h-screen bg-background font-sans antialiased overflow-hidden`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
+        <ThemeProvider>
           {children}
           <Toaster />
         </ThemeProvider>

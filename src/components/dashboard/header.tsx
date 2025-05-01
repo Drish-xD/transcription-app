@@ -15,6 +15,7 @@ import type { auth } from "@/lib/auth";
 import { BellIcon, MenuIcon, PlusIcon } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
+import { ThemeToggle } from "../theme/theme-toggle";
 import { Sidebar } from "./sidebar";
 
 interface HeaderProps {
@@ -44,7 +45,7 @@ export function Header({ user }: HeaderProps) {
               <span className="sr-only">Toggle menu</span>
             </Button>
             <SheetContent side="left" className="p-0">
-              <Sidebar />
+              <Sidebar open={open} />
             </SheetContent>
           </Sheet>
         </div>
@@ -55,6 +56,7 @@ export function Header({ user }: HeaderProps) {
             </h1>
           </div>
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
