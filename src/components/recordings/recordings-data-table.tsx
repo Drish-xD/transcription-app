@@ -1,18 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { recordings } from "@/lib/db/schema";
 import { formatDistanceToNow } from "date-fns";
 import { InferSelectModel } from "drizzle-orm";
-import { MoreHorizontal, Play, Trash } from "lucide-react";
+import { ClockIcon, DownloadIcon, PlayIcon } from "lucide-react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 
 type Recording = InferSelectModel<typeof recordings>;
 
@@ -76,16 +71,6 @@ export function RecordingsDataTable({ recordings }: RecordingsDataTableProps) {
     );
   }, [groupedRecordings]);
 
-  const handlePlay = useCallback((recording: Recording) => {
-    // Implement play functionality
-    console.log("Play recording:", recording);
-  }, []);
-
-  const handleDelete = useCallback((recording: Recording) => {
-    // Implement delete functionality
-    console.log("Delete recording:", recording);
-  }, []);
-
   if (filteredRecordings.length === 0) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center rounded-md border border-dashed p-8 text-center animate-in fade-in-50">
@@ -101,6 +86,13 @@ export function RecordingsDataTable({ recordings }: RecordingsDataTableProps) {
     );
   }
 
+  const formatDuration = (seconds?: number) => {
+    if (!seconds) return "00:00";
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in-50">
       {sortedDates.map((date) => (
@@ -110,45 +102,45 @@ export function RecordingsDataTable({ recordings }: RecordingsDataTableProps) {
           </h3>
           <div className="divide-y divide-border rounded-md border">
             {groupedRecordings[date].map((recording) => (
-              <div
-                key={recording.id}
-                className="flex items-center justify-between p-4"
-              >
-                <div className="flex items-center space-x-4">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => handlePlay(recording)}
-                  >
-                    <Play className="h-4 w-4" />
-                    <span className="sr-only">Play</span>
-                  </Button>
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">
+              <div key={recording.id} className="flex items-center p-4">
+                <div className="flex flex-1 items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                    <PlayIcon className="h-5 w-5 text-primary" />
+                  </div>
+                  <div className="flex-1 space-y-1">
+                    <Link
+                      href={`/dashboard/recordings/${recording.id}`}
+                      className="font-medium hover:underline"
+                    >
                       {recording.name}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {recording.metadata?.mimeType}
-                    </p>
+                    </Link>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>
+                        {recording.type.charAt(0).toUpperCase() +
+                          recording.type.slice(1)}
+                      </span>
+                      <span>•</span>
+                      <span className="flex items-center gap-1">
+                        <ClockIcon className="h-3 w-3" />
+                        {formatDuration(recording.duration)}
+                      </span>
+                      <span>•</span>
+                      <span>
+                        {formatDistanceToNow(new Date(recording.createdAt), {
+                          addSuffix: true,
+                        })}
+                      </span>
+                    </div>
                   </div>
                 </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Actions</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem
-                      className="text-destructive"
-                      onClick={() => handleDelete(recording)}
-                    >
-                      <Trash className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <div className="ml-4 flex gap-2">
+                  <Button variant="ghost" size="icon" asChild>
+                    <Link href={recording.fileUrl} target="_blank" download>
+                      <DownloadIcon className="h-4 w-4" />
+                      <span className="sr-only">Download</span>
+                    </Link>
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
