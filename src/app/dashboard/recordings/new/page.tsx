@@ -25,7 +25,11 @@ export default async function NewRecordingPage({
     folderId = folderIdParam;
   } else {
     const folders = await folderService.getRootFolders(user.id);
-    folderId = folders[0].id;
+    if (folders[0]?.id) {
+      folderId = folders[0].id;
+    } else {
+      folderId = (await folderService.createDefaultWorkspace(user.id)).id;
+    }
   }
 
   return (
